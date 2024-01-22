@@ -1,39 +1,34 @@
 import * as dotenv from 'dotenv';
-import { connectToDatabase, collections } from './db.js';
-import Customer from './customer.model.js';
-import { makeRandomRecordsArray } from './helpers.js';
+import { connectToDatabase } from './db.js';
+import express from 'express';
+import { graphqlHTTP } from 'express-graphql';
+import schema from './schema.js';
+import { root } from './resolvers.js';
+import { addCustomersCallback, syncDevCustomersCallback } from './callbacks.js';
 dotenv.config();
 
-async function addCustomersCallback() {
-  const newCustomers = makeRandomRecordsArray(Math.random() * 10);
-  const data = await collections.Customers?.insertMany(newCustomers);
-  console.log(`Inserted ${data?.insertedCount} new customers`);
-}
-
-async function syncDevCustomersCallback() {
-  const lastAnonymizedCustomer: Customer = (await collections.CustomersAnonymised?.findOne(
-    {},
-    { sort: { _id: -1 } },
-  )) as Customer;
-
-  const newCustomers: Customer[] = (await collections.Customers?.find(
-    lastAnonymizedCustomer?._id ? { _id: { $gt: lastAnonymizedCustomer._id } } : {},
-  ).toArray()) as Customer[];
-
-  if (newCustomers.length === 0) return;
-
-  const anonymizedCustomers: Customer[] = newCustomers.map((el) =>
-    Object.assign(new Customer(), el).getAnonymizedData(),
-  ) as Customer[];
-
-  const data = await collections.CustomersAnonymised?.insertMany(anonymizedCustomers);
-  console.log(`Inserted ${data?.insertedCount} new anonymized customers`);
-}
+const PORT = 4000;
+const app = express();
+app.use('/graphql', graphqlHTTP({ schema, rootValue: root, graphiql: true }));
 
 async function server() {
-  await connectToDatabase();
-  setInterval(addCustomersCallback, 200);
-  setInterval(syncDevCustomersCallback, 200);
+  try {
+    // Connect to the database
+    await connectToDatabase();
+
+    // Add random customers to the database every 200ms
+    setInterval(addCustomersCallback, 200);
+
+    // Synchronize the Customers collection with the CustomersAnonymised collection every 200ms
+    setInterval(syncDevCustomersCallback, 200);
+
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}/graphql`);
+    });
+  } catch (e) {
+    console.error('Server error', e);
+  }
 }
 
 server().then();

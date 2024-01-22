@@ -13,6 +13,6 @@ export async function connectToDatabase() {
   collections.CustomersAnonymised = customersAnonymisedCollection;
 
   console.log(
-    `Successfully connected to database: ${db.databaseName}. Collections: ${Object.keys(collections).join(', ')}`
+    `Successfully connected to database: ${db.databaseName}. Collections: ${Object.keys(collections).join(', ')}`,
   );
 }

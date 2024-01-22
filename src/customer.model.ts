@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { faker, th } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { generateRandomString } from './helpers.js';
+
 interface IAddress {
   _id?: ObjectId;
   line1: string;
@@ -10,6 +11,7 @@ interface IAddress {
   state: string;
   country: string;
 }
+
 export interface ICustomer {
   _id?: ObjectId;
   firstName: string;
@@ -18,6 +20,7 @@ export interface ICustomer {
   address: IAddress;
   createdAt?: Date;
 }
+
 export default class Customer implements ICustomer {
   _id: ObjectId;
   firstName: string;
@@ -25,6 +28,10 @@ export default class Customer implements ICustomer {
   createdAt: Date;
   email: string;
   address: IAddress;
+
+  /**
+   * Creates a new Customer with random data
+   */
   constructor() {
     this._id = new ObjectId();
     this.firstName = faker.person.firstName();
@@ -40,6 +47,10 @@ export default class Customer implements ICustomer {
       country: 'US',
     };
   }
+
+  /**
+   * Returns anonymized customer data
+   */
   public getAnonymizedData(): ICustomer {
     return {
       ...this,

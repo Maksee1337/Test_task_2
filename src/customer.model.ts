@@ -49,9 +49,9 @@ export default class Customer implements ICustomer {
   }
 
   /**
-   * Returns anonymized customer data
+   * Returns anonymised customer data
    */
-  public getAnonymizedData(): ICustomer {
+  public getAnonymisedData(): ICustomer {
     return {
       ...this,
       firstName: generateRandomString(),

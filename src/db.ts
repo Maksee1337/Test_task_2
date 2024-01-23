@@ -7,7 +7,7 @@ export async function connectToDatabase() {
   const db: mongoDB.Db = client.db('shop');
 
   const customersCollection: mongoDB.Collection = db.collection('customers');
-  const customersAnonymisedCollection: mongoDB.Collection = db.collection('customersAnonymised');
+  const customersAnonymisedCollection: mongoDB.Collection = db.collection('customers_anonymised');
 
   collections.Customers = customersCollection;
   collections.CustomersAnonymised = customersAnonymisedCollection;
